@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <script type="text/javascript" src="../../pixymaps.js"></script>
-    <script type="text/javascript" src="../../lib/d3/d3.js"></script>
-    <script type="text/javascript" src="../../lib/d3/d3.geo.js"></script>
+    <script type="text/javascript" src="../pixymaps.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.3.0/d3.min.js"></script>
     <style type="text/css">
 
 body {
@@ -11,8 +10,8 @@ body {
 }
 
 #container {
-  width: 960px;
-  height: 500px;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
 }
 
@@ -27,33 +26,40 @@ body {
 var canvas = d3.select("#map").call(drag),
     context = canvas.node().getContext("2d");
 
-var w = 960,
-    h = 500,
-    lon = -122.41948,
-    lat = 37.76487;
+var h = document.getElementById('container').offsetHeight,
+    w = document.getElementById('container').offsetWidth,
+    lon = 134.41948,
+    lat = -27.88;
+    w = document.body.offsetWidth;
+    h = document.body.offsetHeight;
+    w = window.screen.availWidth;
+    h = window.screen.availHeight;
 
-var project = d3.geo.mercator()
-    .scale(1)
+var project = d3.geoMercator()
+    .scale(1 / (2 * Math.PI))
     .translate([.5, .5]);
 
 var view = pixymaps.view()
     .size([w, h])
     .center(project([lon, lat]))
-    .zoom(12);
+    .zoom(4);
 
 var image = pixymaps.image()
     .view(view)
-    .url(pixymaps.url("http://{S}tile.cloudmade.com"
-    + "/1a1b06b230af4efdbb989ea99e9841af" // http://cloudmade.com/register
-    + "/999/256/{Z}/{X}/{Y}.png")
-    .hosts(["a.", "b.", "c.", ""]))
+     .url(pixymaps.url("http://{S}.tiles.mapbox.com/v3/mapbox.natural-earth-2/{Z}/{X}/{Y}.png")
+    .hosts(["a", "b", "c", "d"]))
+    // .url(pixymaps.url("https://maps.googleapis.com/maps/vt?pb=!1m5!1m4!1i4!2i7!3i7!4i256!2m3!1e0!2sm!3i367041038!3m14!2sen-US!3sUS!5e18!12m1!1e47!12m3!1e37!2m1!1ssmartmaps!12m4!1e26!2m2!1sstyles!2zcy5lOmd8cC5jOiNmZmViZTNjZCxzLmU6bC50LmZ8cC5jOiNmZjUyMzczNSxzLmU6bC50LnN8cC5jOiNmZmY1ZjFlNixzLnQ6ODJ8cy5lOmd8cC5jOiNmZmRmZDJhZSxzLnQ6MnxzLmU6Z3xwLmM6I2ZmZGZkMmFlLHMudDoyfHMuZTpsLnQuZnxwLmM6I2ZmOTM4MTdjLHMudDo0MHxzLmU6Zy5mfHAuYzojZmZhNWIwNzYscy50OjQwfHMuZTpsLnQuZnxwLmM6I2ZmNDQ3NTMwLHMudDozfHMuZTpnfHAuYzojZmZmNWYxZTYscy50OjUwfHMuZTpnfHAuYzojZmZmZGZjZjgscy50OjQ5fHMuZTpnfHAuYzojZmY0NjVCNzgscy50OjQ5fHMuZTpnLnN8cC5jOiNmZjIxMkIzOCxzLnQ6Nzg1fHMuZTpnfHAuYzojZmY1RTY5Nzgscy50Ojc4NXxzLmU6Zy5zfHAuYzojZmYyMTJCMzgscy50OjUxfHMuZTpsLnQuZnxwLmM6I2ZmN0Q5NkI4LHMudDo2fHMuZTpsfHAuYzojZmYyNjI2MjZ8cC52Om9mZixzLnQ6NnxzLmU6Zy5mfHAudjpvbnxwLmM6I2ZmMjYyNjI2LHMudDoxMzE0fHMuZTpnLmZ8cC52Om9mZixzLnQ6M3xzLmU6bHxwLnY6b2ZmLHMudDoyfHAudjpvZmYscy50OjR8cC52Om9mZg!4e0!5m1!5f2&token=129905"))
     .render(canvas.node());
 
 function drag(selection) {
   var p0;
 
-  selection.on("mousedown", mousedown);
-  d3.select(window).on("mousemove", mousemove).on("mouseup", mouseup);
+  selection
+      .on("mousedown", mousedown);
+
+  d3.select(window)
+      .on("mousemove", mousemove)
+      .on("mouseup", mouseup);
 
   function mousedown() {
     p0 = [d3.event.pageX, d3.event.pageY];
